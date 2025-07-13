@@ -71,6 +71,18 @@ function App() {
     explanation,
   } = data;
 
+  const hasDate = Boolean(date);
+  const hasVisitorCount = typeof visitor_count === 'number';
+  const hasPoem = poem && poem.trim() !== '';
+  const hasExplanation = explanation && explanation.trim() !== '';
+
+  // Check if returned date matches today
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  const isToday = hasDate && date === today;
+  const isDateMismatch = hasDate && !isToday;
+
+  const showCopyright = copyright && copyright !== 'null' && copyright.trim() !== '';
+
   let poemTitle = '';
   let poemBody = poem;
   if (poem.startsWith('**')) {
@@ -87,36 +99,52 @@ function App() {
         {darkMode ? 'Prefer light mode?' : 'Prefer dark mode?'}
       </button>
       <div className="narrow">
-      <p className="date-heading">Today is {formatDate(date)}</p>
-      <p>Welcome! You are visitor number {visitor_count} today.</p>
+      {hasDate && <p className="date-heading">Today is {formatDate(date)}</p>}
+      {hasVisitorCount && <p>Welcome! You are visitor number {visitor_count} today.</p>}
+
+      {isDateMismatch && (
+        <div style={{ 
+          background: '#fff3cd', 
+          border: '1px solid #ffeaa7', 
+          borderRadius: '4px', 
+          padding: '0.75rem', 
+          margin: '1rem 0',
+          color: '#856404'
+        }}>
+          <strong>Note:</strong> Today's image isn't available yet. Showing content from {formatDate(date)} instead.
+        </div>
+      )}
 
       <p>
         Every day, scientists at NASA share a unique photograph of our fascinating universe. And 
-        each day, this program generates a Shakespearean sonnet to commemorate the image and its features.
+        each day, this program generates a Shakespearean sonnet to commemorate the image and its 
+        features.
       </p>
 
       <p className="image-intro">
-        Today&apos;s image is below.
+        {isToday ? "Today's image is below." : `Image from ${formatDate(date)} is below.`}
       </p>
 
       {imageUrl && (
         <>
           <img className="apod" src={imageUrl} alt={title || 'NASA Astronomy Picture of the Day'} />
-          <small>© {copyright}</small>
+          {showCopyright && <small>© {copyright}</small>}
         </>
       )}
 
-      {explanation && (
+      {hasExplanation && (
         <div className="explanation-box">
           <div className="explanation-title">Explanation written by a professional astronomer</div>
           <p style={{ margin: 0 }}>{explanation}</p>
         </div>
       )}
 
-      <div className="poem-box">
-        {poemTitle && <div className="poem-title">{poemTitle}</div>}
-        <div className="poem-body">{poemBody}</div>
-      </div>
+      {hasPoem && (
+        <div className="poem-box">
+          {poemTitle && <div className="poem-title">{poemTitle}</div>}
+          <div className="poem-body">{poemBody}</div>
+        </div>
+      )}
       </div>
     </div>
   );
