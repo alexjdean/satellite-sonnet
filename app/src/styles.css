@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@400;600&display=swap');
+
+:root {
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Open Sans', sans-serif;
+  --color-bg: #fdfdfc;
+  --color-text: #222;
+  --poem-box-bg: #ffffffcc;
+  --explanation-bg: #ffffffaa;
+  --bg-gradient: linear-gradient(180deg, #fdfdfc 0%, #f1f4ff 100%);
+}
+
+body.dark-mode {
+  --color-bg: #0d1117;
+  --color-text: #e6e6e6;
+  --poem-box-bg: #1f2937cc;
+  --explanation-bg: #2a35449d;
+  --bg-gradient: linear-gradient(180deg, #0d1117 0%, #0b0e13 100%);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 800px;
+  padding: 2rem 1rem 4rem;
+  text-align: center;
+}
+
+.narrow {
+  width: 85%;
+  max-width: 550px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.date-heading {
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+.poem-title {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin: 0 0 1rem;
+}
+
+.poem-body {
+  white-space: pre-line;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+}
+
+img.apod {
+  width: 100%;
+  max-width: 550px;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.75rem 0 0.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+small {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.poem-box {
+  background: var(--poem-box-bg);
+  backdrop-filter: blur(2px);
+  border-radius: 6px;
+  padding: 1.5rem 1rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.toggle-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: 1px solid var(--color-text);
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.toggle-btn:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+.explanation-box {
+  background: var(--explanation-bg);
+  backdrop-filter: blur(1px);
+  border-left: 3px solid rgba(0,0,0,0.1);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0 1rem;
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  font-size: 0.9rem;
+}
+
+.explanation-title {
+  font-style: italic;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.image-intro {
+  margin-bottom: 0.25rem;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(110deg, #e2e2e2 8%, #f5f5f5 18%, #e2e2e2 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+body.dark-mode .skeleton {
+  background: linear-gradient(110deg, #2e3440 8%, #3b4252 18%, #2e3440 33%);
+}
+
+.image-skeleton {
+  width: 100%;
+  max-width: 550px;
+  height: 300px;
+  border-radius: 4px;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.poem-skeleton {
+  width: 100%;
+  height: 220px;
+  border-radius: 6px;
+  margin-top: 0.75rem;
+}
+
+.loading-text {
+  font-style: italic;
+  margin: 1.5rem 0;
+  opacity: 0.8;
+}
+
+@media (max-width: 480px) {
+  .toggle-btn {
+    position: static;
+    margin: 0 auto 1rem;
+    display: inline-block;
+  }
+} 
