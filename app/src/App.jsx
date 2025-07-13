@@ -18,7 +18,7 @@ function App() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const prefersDark = (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [darkMode, setDarkMode] = useState(prefersDark);
 
   useEffect(() => {
