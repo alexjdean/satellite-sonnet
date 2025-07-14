@@ -77,7 +77,7 @@ function App() {
   const hasExplanation = explanation && explanation.trim() !== '';
 
   // Check if returned date matches today
-  const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format in local timezone
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // YYYY-MM-DD format in Eastern timezone
   const isToday = hasDate && date === today;
   const isDateMismatch = hasDate && !isToday;
 

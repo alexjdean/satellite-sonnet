@@ -212,4 +212,69 @@ describe('App Component', () => {
       unmount()
     })
   })
+
+  it('uses Eastern timezone for date comparison', async () => {
+    // Mock system time to a specific moment
+    const mockDate = new Date('2025-07-14T02:30:00-04:00') // 2:30 AM Eastern = July 14
+    vi.setSystemTime(mockDate)
+
+    // Lambda returns July 14 (same as Eastern date)
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...mockApiResponse, date: '2025-07-14' })
+    })
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Today is Monday, July 14, 2025')).toBeInTheDocument()
+    })
+
+    // Should NOT show date mismatch warning since dates match in Eastern time
+    expect(screen.queryByText(/Today's image isn't available yet/)).not.toBeInTheDocument()
+    expect(screen.getByText("Today's image is below.")).toBeInTheDocument()
+  })
+
+  it('detects date mismatch using Eastern timezone', async () => {
+    // Mock system time to July 15 in Eastern time
+    const mockDate = new Date('2025-07-15T10:00:00-04:00') // 10 AM Eastern = July 15
+    vi.setSystemTime(mockDate)
+
+    // Lambda returns July 14 (yesterday in Eastern time)
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...mockApiResponse, date: '2025-07-14' })
+    })
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Today is Monday, July 14, 2025')).toBeInTheDocument()
+    })
+
+    // SHOULD show date mismatch warning
+    expect(screen.getByText(/Today's image isn't available yet/)).toBeInTheDocument()
+    expect(screen.getByText('Image from Monday, July 14, 2025 is below.')).toBeInTheDocument()
+  })
+
+  it('handles timezone edge cases correctly', async () => {
+    // Test Pacific 11:30 PM = Eastern 2:30 AM next day
+    const mockDate = new Date('2025-07-13T23:30:00-07:00') // 11:30 PM Pacific July 13
+    vi.setSystemTime(mockDate) // This is 2:30 AM Eastern July 14
+
+    // Lambda returns July 14 (matches Eastern date)
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...mockApiResponse, date: '2025-07-14' })
+    })
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Today is Monday, July 14, 2025')).toBeInTheDocument()
+    })
+
+    // Should NOT show mismatch because it's July 14 in Eastern time
+    expect(screen.queryByText(/Today's image isn't available yet/)).not.toBeInTheDocument()
+  })
 })
