@@ -31,22 +31,37 @@ function App() {
   }, [darkMode]);
 
   useEffect(() => {
-    fetch(LAMBDA_URL)
+    // Always fetch fresh data from API for strongly consistent visitor count
+    const controller = new AbortController();
+    
+    fetch(LAMBDA_URL, {
+      signal: controller.signal,
+    })
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
         return res.json();
       })
       .then((json) => {
         setData(json);
+        setLoading(false);
       })
       .catch((err) => {
-        setError(err);
-      })
-      .finally(() => {
-        setLoading(false);
+        if (err.name !== 'AbortError') {
+          console.error('Fetch error:', err);
+          console.error('Error details:', {
+            name: err.name,
+            message: err.message,
+            stack: err.stack
+          });
+          setError(err);
+          setLoading(false);
+        }
       });
+
+    // Cleanup function to abort request if component unmounts
+    return () => controller.abort();
   }, []);
 
   if (loading) return (

@@ -4,6 +4,22 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/satellite-sonnet/',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+        },
+      },
+    },
+    minify: 'esbuild',
+    cssMinify: true,
+  },
+  server: {
+    headers: {
+      'Cache-Control': 'public, max-age=300',
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

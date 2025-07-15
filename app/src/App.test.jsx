@@ -29,6 +29,9 @@ describe('App Component', () => {
     // Reset fetch mock before each test
     vi.clearAllMocks()
     
+    // Clear localStorage before each test (in case other tests use it)
+    localStorage.clear()
+    
     // Mock current date to 2025-01-11 for consistent testing
     vi.setSystemTime(new Date('2025-01-11T12:00:00Z'))
   })
@@ -123,7 +126,7 @@ describe('App Component', () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText('Error: HTTP 500')).toBeInTheDocument()
+      expect(screen.getByText('Error: HTTP 500: undefined')).toBeInTheDocument()
     })
   })
 
@@ -276,5 +279,63 @@ describe('App Component', () => {
 
     // Should NOT show mismatch because it's July 14 in Eastern time
     expect(screen.queryByText(/Today's image isn't available yet/)).not.toBeInTheDocument()
+  })
+
+  it('always fetches fresh data from API', async () => {
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockApiResponse
+    })
+
+    render(<App />)
+
+    // Should show loading state since we always fetch fresh data
+    expect(screen.getByText('Warming up the telescopes…')).toBeInTheDocument()
+
+    // Should call fetch for fresh data
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+        'https://frlhujgplrokvbaq3oymsrhq2e0frqys.lambda-url.us-west-2.on.aws/',
+        expect.objectContaining({
+          signal: expect.any(AbortSignal)
+        })
+      )
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('Today is Saturday, January 11, 2025')).toBeInTheDocument()
+    })
+  })
+
+  it('ensures strongly consistent visitor count data', async () => {
+    // Mock multiple API calls with different visitor counts
+    fetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ...mockApiResponse, visitor_count: 100 })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ...mockApiResponse, visitor_count: 101 })
+      })
+
+    // First render
+    const { unmount } = render(<App />)
+    
+    await waitFor(() => {
+      expect(screen.getByText('Welcome! You are visitor number 100 today.')).toBeInTheDocument()
+    })
+
+    unmount()
+
+    // Second render should fetch fresh data, not use cache
+    render(<App />)
+    
+    await waitFor(() => {
+      expect(screen.getByText('Welcome! You are visitor number 101 today.')).toBeInTheDocument()
+    })
+
+    // Should have made 2 separate API calls
+    expect(fetch).toHaveBeenCalledTimes(2)
   })
 })
